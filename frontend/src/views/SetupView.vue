@@ -192,7 +192,11 @@ const handleSubmit = async () => {
         const successMessage = document.createElement('div')
         successMessage.className = 'success-message'
         successMessage.style.cssText = 'background: #10b981; color: white; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; text-align: center; font-weight: bold;'
-        successMessage.textContent = '✅ Organization created successfully! Redirecting to AI Agents...'
+        successMessage.innerHTML = `
+            ✅ Organization created successfully!
+            <br>Redirecting to AI Agents in 2 seconds...
+            <br><button onclick="window.location.href='/ai-agents'" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: white; color: #10b981; border: none; border-radius: 0.25rem; cursor: pointer;">Go to Dashboard Now</button>
+        `
 
         // Insert success message at the top of the form
         const form = document.querySelector('form')
@@ -200,9 +204,17 @@ const handleSubmit = async () => {
             form.parentNode?.insertBefore(successMessage, form)
         }
 
-        // Wait 2 seconds then redirect
+        // Wait 2 seconds then redirect using window.location
         setTimeout(() => {
-            router.push('/ai-agents')
+            console.log('Attempting redirect to /ai-agents')
+            try {
+                // Try router first
+                router.push('/ai-agents')
+            } catch (routerError) {
+                console.log('Router failed, using window.location:', routerError)
+                // Fallback to window.location
+                window.location.href = '/ai-agents'
+            }
         }, 2000)
 
     } catch (e) {
