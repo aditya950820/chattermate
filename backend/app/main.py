@@ -123,16 +123,39 @@ async def debug_info():
         "api_base": "/api/v1"
     }
 
+# Global flag to track database status
+DATABASE_AVAILABLE = False
+
+# Global flag to track if organization has been created
+ORGANIZATION_CREATED = False
+
+@app.on_event("startup")
+async def startup_event():
+    global DATABASE_AVAILABLE
+    try:
+        # Test database connection on startup
+        from sqlalchemy import create_engine
+        engine = create_engine('postgresql+psycopg://chattermate_user:chattermate_pass_2024@db:5432/chattermate_db')
+        with engine.connect() as conn:
+            conn.execute('SELECT 1')
+        DATABASE_AVAILABLE = True
+        logger.info("Database connection established on startup")
+    except Exception as e:
+        DATABASE_AVAILABLE = False
+        logger.warning(f"Database not available on startup: {e}. Running in mock mode.")
+
 @app.get("/api/v1/organizations/setup-status")
 async def setup_status():
-    logger.info("Setup status endpoint called")
+    global ORGANIZATION_CREATED
+    logger.info(f"Setup status endpoint called - Organization created: {ORGANIZATION_CREATED}")
     return {
-        "is_setup": False,
+        "is_setup": ORGANIZATION_CREATED,
         "message": "Organization setup status endpoint working"
     }
 
 @app.post("/api/v1/organizations")
 async def create_organization(org_data: OrganizationCreate):
+    global ORGANIZATION_CREATED
     logger.info(f"=== CREATE ORGANIZATION CALLED ===")
     logger.info(f"Organization name: {org_data.name}")
     logger.info(f"Domain: {org_data.domain}")
@@ -167,7 +190,10 @@ async def create_organization(org_data: OrganizationCreate):
         is_active=True
     )
     
+    # Set the organization created flag
+    ORGANIZATION_CREATED = True
     logger.info(f"Organization created successfully: {org_data.name}")
+    logger.info(f"ORGANIZATION_CREATED flag set to: {ORGANIZATION_CREATED}")
     logger.info(f"=== CREATE ORGANIZATION COMPLETED ===")
     
     return OrganizationCreateResponse(
