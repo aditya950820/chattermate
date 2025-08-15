@@ -46,11 +46,17 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    initialize_firebase()
-    await startup_event()
+    try:
+        logger.info("Starting up ChatterMate application...")
+        initialize_firebase()
+        await startup_event()
+        logger.info("ChatterMate application started successfully!")
+    except Exception as e:
+        logger.error(f"Error during startup: {e}")
+        # Don't fail startup for non-critical errors
     yield
     # Shutdown
-    pass
+    logger.info("Shutting down ChatterMate application...")
 
 # Move the CORS setup before app instantiation
 cors_origins = get_cors_origins()
@@ -71,10 +77,13 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """Configure Socket.IO on startup"""
-    configure_socketio(cors_origins)
-    
-    # Start CORS listener for multi-worker synchronization
-    initialize_cors_listener()
+    try:
+        configure_socketio(cors_origins)
+        # Start CORS listener for multi-worker synchronization
+        initialize_cors_listener()
+    except Exception as e:
+        logger.error(f"Error configuring Socket.IO: {e}")
+        # Don't fail startup for Socket.IO errors
 
 # Include routers
 app.include_router(
@@ -104,21 +113,27 @@ app.include_router(
 )
 
 app.include_router(
+    ai_setup.router,
+    prefix=f"{settings.API_V1_STR}/ai-setup",
+    tags=["ai-setup"]
+)
+
+app.include_router(
     knowledge.router,
     prefix=f"{settings.API_V1_STR}/knowledge",
     tags=["knowledge"]
 )
 
 app.include_router(
-    ai_setup.router,
-    prefix=f"{settings.API_V1_STR}/ai",
-    tags=["ai"]
+    agent.router,
+    prefix=f"{settings.API_V1_STR}/agents",
+    tags=["agents"]
 )
 
 app.include_router(
-    agent.router,
-    prefix=f"{settings.API_V1_STR}/agent",
-    tags=["agent"]
+    widget_chat.router,
+    prefix=f"{settings.API_V1_STR}/widget-chat",
+    tags=["widget-chat"]
 )
 
 app.include_router(
