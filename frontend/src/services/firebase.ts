@@ -13,16 +13,35 @@ const firebaseConfig = {
 }
 
 export const initializeFirebase = () => {
-  initializeApp(firebaseConfig)
+  // Only initialize if we have the required config
+  if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+    try {
+      initializeApp(firebaseConfig)
+      console.log('Firebase initialized successfully')
+    } catch (error) {
+      console.warn('Firebase initialization failed:', error)
+    }
+  } else {
+    console.log('Firebase not configured, skipping initialization')
+  }
 }
 
-export const messaging = getMessaging(initializeApp(firebaseConfig))
+// Only create messaging if Firebase is properly configured
+export const messaging = firebaseConfig.apiKey && firebaseConfig.projectId
+  ? getMessaging(initializeApp(firebaseConfig))
+  : null
 
 export const requestNotificationPermission = async () => {
   try {
     // Check if browser supports notifications
     if (!('Notification' in window)) {
-      console.error("Browser doesn't support notifications")
+      console.log("Browser doesn't support notifications")
+      return
+    }
+
+    // Check if Firebase is configured
+    if (!messaging) {
+      console.log('Firebase not configured, skipping notification setup')
       return
     }
 
@@ -39,6 +58,6 @@ export const requestNotificationPermission = async () => {
       }
     }
   } catch (err) {
-    console.error('Failed to get notification permission:', err)
+    console.warn('Failed to get notification permission:', err)
   }
 }
