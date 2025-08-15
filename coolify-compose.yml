@@ -9,93 +9,20 @@ services:
       - "9001:8000"
     environment:
       - ENVIRONMENT=production
-      - TIMEOUT=120
-      # Optional: override these at deploy time in Coolify if needed
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:9000}
-      - VITE_WIDGET_URL=${VITE_WIDGET_URL:-http://localhost:9000}
-      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:9001}
-      # HuggingFace/PyTorch caches
-      - HF_HOME=/app/.cache/huggingface
-      - TORCH_HOME=/app/.cache/torch
-      - TRANSFORMERS_CACHE=/app/.cache/huggingface/transformers
-      - SENTENCE_TRANSFORMERS_HOME=/app/.cache/huggingface/sentence_transformers
-      - HUGGINGFACE_HUB_CACHE=/app/.cache/huggingface/hub
-      - PYTORCH_TRANSFORMERS_CACHE=/app/.cache/pytorch_transformers
-      # Database Configuration
-      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://chattermate:chattermate@db:5432/chattermate}
-      # Redis Configuration
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      - REDIS_ENABLED=${REDIS_ENABLED:-true}
-      # JWT Security
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-super-secret-jwt-key-change-this-in-production}
-      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
-      - CONVERSATION_SECRET_KEY=${CONVERSATION_SECRET_KEY:-your-super-secret-conversation-key-change-this-in-production}
-      # CORS Configuration
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:9000,http://localhost:5173,https://chattermate.chat}
-      # Encryption
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-RFQ4SzhyRTVYdGtsLUxsc25SaDB0QlZpbTdQRmlVRlpsZUlCaFRlU2Vxbz0=}
-      # Email Configuration (optional)
-      - SMTP_SERVER=${SMTP_SERVER:-smtp.gmail.com}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_USERNAME=${SMTP_USERNAME:-your-email@gmail.com}
-      - SMTP_PASSWORD=${SMTP_PASSWORD:-your-password}
-      - FROM_EMAIL=${FROM_EMAIL:-noreply@chattermate.chat}
-      - FROM_NAME=${FROM_NAME:-ChatterMate}
-      # Firebase Configuration (optional)
-      - FIREBASE_CREDENTIALS=${FIREBASE_CREDENTIALS:-}
-      # Payment Configuration (optional)
-      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID:-test}
-      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET:-test}
-      - PAYPAL_SANDBOX_MODE=${PAYPAL_SANDBOX_MODE:-true}
-      - PAYPAL_WEBHOOK_ID=${PAYPAL_WEBHOOK_ID:-test}
-      # Shopify Configuration (optional)
-      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY:-}
-      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET:-}
-      - SHOPIFY_API_VERSION=${SHOPIFY_API_VERSION:-2025-04}
-      - VERIFY_SSL_CERTIFICATES=${VERIFY_SSL_CERTIFICATES:-true}
-      # S3 Configuration (optional)
-      - S3_FILE_STORAGE=${S3_FILE_STORAGE:-false}
-      - S3_BUCKET=${S3_BUCKET:-chattermate-uploads}
-      - S3_REGION=${S3_REGION:-us-east-1}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
-      # Knowledge Base Configuration
-      - KB_MAX_DEPTH=${KB_MAX_DEPTH:-5}
-      - KB_MAX_LINKS=${KB_MAX_LINKS:-25}
-      - KB_MIN_CONTENT_LENGTH=${KB_MIN_CONTENT_LENGTH:-100}
-      - KB_TIMEOUT=${KB_TIMEOUT:-30}
-      - KB_MAX_RETRIES=${KB_MAX_RETRIES:-3}
-      - KB_MAX_WORKERS=${KB_MAX_WORKERS:-5}
-      - KB_BATCH_SIZE=${KB_BATCH_SIZE:-5}
-      - KB_OPTIMIZE_ON=${KB_OPTIMIZE_ON:-1000}
-      # Embedding Configuration
-      - EMBEDDING_MODEL_ID=${EMBEDDING_MODEL_ID:-sentence-transformers/all-MiniLM-L6-v2}
-      - EMBEDDING_BATCH_SIZE=${EMBEDDING_BATCH_SIZE:-32}
-      - EMBEDDING_MAX_WORKERS=${EMBEDDING_MAX_WORKERS:-4}
-      - FASTEMBED_MODEL=${FASTEMBED_MODEL:-BAAI/bge-small-en-v1.5}
-      - ENABLE_IMMEDIATE_EMBEDDING=${ENABLE_IMMEDIATE_EMBEDDING:-true}
-      - EMBEDDING_SINGLE_THREADED=${EMBEDDING_SINGLE_THREADED:-true}
-      - EMBEDDING_SEQUENTIAL_FALLBACK=${EMBEDDING_SEQUENTIAL_FALLBACK:-true}
-      # Explore Configuration
-      - EXPLORE_SOURCE_ORG_ID=${EXPLORE_SOURCE_ORG_ID:-bab82aab-d095-46f8-bf16-da638671bcf4}
-      - EXPLORE_AGENT_ID=${EXPLORE_AGENT_ID:-b20188ee-2800-41d0-8bf1-8fc291ab0076}
-      - EXPLORE_USER_ID=${EXPLORE_USER_ID:-154540a3-6177-4b1b-aab2-f23f0ef74ac7}
-      - EXPLORE_WIDGET_ID=${EXPLORE_WIDGET_ID:-397046dc-0093-4499-ab45-a0afe3c3ee14}
+      - DATABASE_URL=postgresql+psycopg://chattermate:chattermate@db:5432/chattermate
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_ENABLED=true
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
+      - JWT_ALGORITHM=HS256
+      - CONVERSATION_SECRET_KEY=your-super-secret-conversation-key-change-this-in-production
+      - CORS_ORIGINS=http://localhost:9000,http://localhost:5173,https://chattermate.chat
+      - ENCRYPTION_KEY=RFQ4SzhyRTVYdGtsLUxsc25SaDB0QlZpbTdQRmlVRlpsZUlCaFRlU2Vxbz0=
+      - FRONTEND_URL=http://localhost:9000
+      - VITE_WIDGET_URL=http://localhost:9000
+      - APP_BASE_URL=http://localhost:9001
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    volumes:
-      - huggingface_cache:/app/.cache/huggingface
-      - torch_cache:/app/.cache/torch
-      - backend_data:/app/uploads
+      - db
+      - redis
     restart: unless-stopped
 
   frontend:
@@ -114,31 +41,16 @@ services:
       - POSTGRES_DB=chattermate
       - POSTGRES_USER=chattermate
       - POSTGRES_PASSWORD=chattermate
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chattermate -d chattermate"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
     volumes:
       - redis_data:/data
     restart: unless-stopped
 
 volumes:
-  huggingface_cache:
-  torch_cache:
-  backend_data:
   postgres_data:
   redis_data: 
