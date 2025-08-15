@@ -1,34 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=chattermate_db
-      - POSTGRES_USER=chattermate_user
-      - POSTGRES_PASSWORD=chattermate_pass_2024
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chattermate_user -d chattermate_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: .
@@ -37,19 +9,11 @@ services:
       - "9001:8000"
     environment:
       - ENVIRONMENT=production
-      - DATABASE_URL=postgresql+psycopg://chattermate_user:chattermate_pass_2024@db:5432/chattermate_db
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_ENABLED=true
       - JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
       - JWT_ALGORITHM=HS256
       - CONVERSATION_SECRET_KEY=your-super-secret-conversation-key-change-this-in-production
       - CORS_ORIGINS=http://localhost:9000,http://localhost:5173,https://chattermate.chat
       - ENCRYPTION_KEY=RFQ4SzhyRTVYdGtsLUxsc25SaDB0QlZpbTdQRmlVRlpsZUlCaFRlU2Vxbz0=
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     restart: unless-stopped
 
   frontend:
@@ -65,8 +29,4 @@ services:
       - NODE_ENV=production
     depends_on:
       - backend
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-  redis_data: 
+    restart: unless-stopped 
