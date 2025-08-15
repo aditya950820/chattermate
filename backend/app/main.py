@@ -112,6 +112,17 @@ async def api_test():
         "timestamp": "2024-01-01T00:00:00Z"
     }
 
+@app.get("/api/debug")
+async def debug_info():
+    logger.info("Debug endpoint called")
+    return {
+        "status": "success",
+        "message": "Debug endpoint working",
+        "backend_url": "http://backend:8000",
+        "frontend_url": "http://frontend:80",
+        "api_base": "/api/v1"
+    }
+
 @app.get("/api/v1/organizations/setup-status")
 async def setup_status():
     logger.info("Setup status endpoint called")
