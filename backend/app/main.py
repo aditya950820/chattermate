@@ -16,14 +16,40 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>
 """
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Dict, Any, Optional
 import os
 import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Pydantic models for request/response
+class OrganizationCreate(BaseModel):
+    name: str
+    domain: str
+    timezone: str
+    business_hours: Dict[str, Any]
+    admin_email: str
+    admin_name: str
+    admin_password: str
+    settings: Optional[Dict[str, Any]] = {}
+
+class User(BaseModel):
+    id: str
+    email: str
+    full_name: str
+    organization_id: str
+    role_id: str
+    is_active: bool
+
+class OrganizationCreateResponse(BaseModel):
+    organization: Dict[str, Any]
+    user: User
+    message: str
 
 # Create a FastAPI app with basic configuration
 app = FastAPI(
@@ -90,18 +116,45 @@ async def api_test():
 async def setup_status():
     logger.info("Setup status endpoint called")
     return {
-        "status": "not_setup",
+        "is_setup": False,
         "message": "Organization setup status endpoint working"
     }
 
 @app.post("/api/v1/organizations")
-async def create_organization():
-    logger.info("Create organization endpoint called")
-    return {
-        "status": "success",
-        "message": "Organization creation endpoint working",
-        "organization_id": "test-org-123"
+async def create_organization(org_data: OrganizationCreate):
+    logger.info(f"Create organization endpoint called with data: {org_data.name}")
+    
+    # Validate required fields
+    if not org_data.name or not org_data.domain or not org_data.admin_email:
+        raise HTTPException(status_code=400, detail="Missing required fields")
+    
+    # Mock successful organization creation
+    mock_organization = {
+        "id": "org-123",
+        "name": org_data.name,
+        "domain": org_data.domain,
+        "timezone": org_data.timezone,
+        "business_hours": org_data.business_hours,
+        "is_active": True,
+        "created_at": "2024-01-01T00:00:00Z"
     }
+    
+    mock_user = User(
+        id="user-123",
+        email=org_data.admin_email,
+        full_name=org_data.admin_name,
+        organization_id="org-123",
+        role_id="role-admin",
+        is_active=True
+    )
+    
+    logger.info(f"Organization created successfully: {org_data.name}")
+    
+    return OrganizationCreateResponse(
+        organization=mock_organization,
+        user=mock_user,
+        message="Organization created successfully"
+    )
 
 @app.get("/api/v1/users")
 async def get_users():
@@ -121,10 +174,24 @@ async def create_user():
 
 @app.get("/test-db")
 async def test_db():
-    return {
-        "status": "info",
-        "message": "Database connection temporarily disabled for testing"
-    }
+    try:
+        # Test database connection directly with hardcoded credentials
+        from sqlalchemy import create_engine
+        database_url = "postgresql+psycopg://chattermate_user:chattermate_pass_2024@db:5432/chattermate_db"
+        engine = create_engine(database_url)
+        with engine.connect() as conn:
+            result = conn.execute('SELECT 1')
+            return {
+                "status": "success",
+                "message": "Database connection working!",
+                "result": "Database is accessible"
+            }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Database connection failed: {str(e)}",
+            "error": str(e)
+        }
 
 # Create upload directories if they don't exist
 if not os.path.exists("uploads"):
