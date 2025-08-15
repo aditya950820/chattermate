@@ -200,6 +200,24 @@ async def test_db():
         "mode": "simple"
     }
 
+@app.get("/api/test-form")
+async def test_form():
+    logger.info("Test form endpoint called")
+    return {
+        "status": "success",
+        "message": "Form submission test working!",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+
+@app.post("/api/test-form")
+async def test_form_post():
+    logger.info("Test form POST endpoint called")
+    return {
+        "status": "success",
+        "message": "POST request working!",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+
 # Create upload directories if they don't exist
 if not os.path.exists("uploads"):
     os.makedirs("uploads")
