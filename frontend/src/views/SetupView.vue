@@ -186,7 +186,25 @@ const handleSubmit = async () => {
         console.log('Calling createOrganization with data:', orgData.value)
         await createOrganization(orgData.value)
         console.log('Organization created successfully!')
-        router.push('/ai-agents')
+
+        // Show success message
+        error.value = '' // Clear any previous errors
+        const successMessage = document.createElement('div')
+        successMessage.className = 'success-message'
+        successMessage.style.cssText = 'background: #10b981; color: white; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; text-align: center; font-weight: bold;'
+        successMessage.textContent = '✅ Organization created successfully! Redirecting to AI Agents...'
+
+        // Insert success message at the top of the form
+        const form = document.querySelector('form')
+        if (form) {
+            form.parentNode?.insertBefore(successMessage, form)
+        }
+
+        // Wait 2 seconds then redirect
+        setTimeout(() => {
+            router.push('/ai-agents')
+        }, 2000)
+
     } catch (e) {
         console.error('Error creating organization:', e)
         error.value = e instanceof Error ? e.message : 'Failed to create organization'
