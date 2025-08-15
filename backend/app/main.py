@@ -133,10 +133,18 @@ async def setup_status():
 
 @app.post("/api/v1/organizations")
 async def create_organization(org_data: OrganizationCreate):
-    logger.info(f"Create organization endpoint called with data: {org_data.name}")
+    logger.info(f"=== CREATE ORGANIZATION CALLED ===")
+    logger.info(f"Organization name: {org_data.name}")
+    logger.info(f"Domain: {org_data.domain}")
+    logger.info(f"Admin email: {org_data.admin_email}")
+    logger.info(f"Admin name: {org_data.admin_name}")
+    logger.info(f"Timezone: {org_data.timezone}")
+    logger.info(f"Business hours: {org_data.business_hours}")
+    logger.info(f"Settings: {org_data.settings}")
     
     # Validate required fields
     if not org_data.name or not org_data.domain or not org_data.admin_email:
+        logger.error("Missing required fields")
         raise HTTPException(status_code=400, detail="Missing required fields")
     
     # Mock successful organization creation
@@ -160,6 +168,7 @@ async def create_organization(org_data: OrganizationCreate):
     )
     
     logger.info(f"Organization created successfully: {org_data.name}")
+    logger.info(f"=== CREATE ORGANIZATION COMPLETED ===")
     
     return OrganizationCreateResponse(
         organization=mock_organization,
