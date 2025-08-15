@@ -9,7 +9,7 @@ services:
       - "9001:8000"
     environment:
       - ENVIRONMENT=production
-      - DATABASE_URL=postgresql+psycopg://chattermate:chattermate@db:5432/chattermate
+      - DATABASE_URL=postgresql+psycopg://chattermate_user:chattermate_pass_2024@db:5432/chattermate_db
       - REDIS_URL=redis://redis:6379/0
       - REDIS_ENABLED=true
       - JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
@@ -35,9 +35,9 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_DB=chattermate
-      - POSTGRES_USER=chattermate
-      - POSTGRES_PASSWORD=chattermate
+      - POSTGRES_DB=chattermate_db
+      - POSTGRES_USER=chattermate_user
+      - POSTGRES_PASSWORD=chattermate_pass_2024
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped

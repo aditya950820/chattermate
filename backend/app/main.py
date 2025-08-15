@@ -84,7 +84,7 @@ async def test_db():
     try:
         # Test database connection directly without using the config system
         from sqlalchemy import create_engine
-        database_url = "postgresql+psycopg://chattermate:chattermate@db:5432/chattermate"
+        database_url = "postgresql+psycopg://chattermate_user:chattermate_pass_2024@db:5432/chattermate_db"
         engine = create_engine(database_url)
         with engine.connect() as conn:
             result = conn.execute('SELECT 1')
