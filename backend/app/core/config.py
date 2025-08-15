@@ -54,6 +54,13 @@ class Settings(BaseSettings):
     # CORS Configuration
     CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", DEFAULT_CORS)
     
+    @field_validator('CORS_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(',')]
+        return v
+    
 
     # Firebase config
     FIREBASE_CREDENTIALS: str = os.getenv(
