@@ -16,9 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create a FastAPI app with basic configuration
 app = FastAPI(
@@ -35,6 +40,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
 
 @app.get("/")
 async def root():
@@ -65,8 +77,18 @@ async def health():
         "version": "0.1.0"
     }
 
+@app.get("/api/test")
+async def api_test():
+    logger.info("API test endpoint called")
+    return {
+        "status": "success",
+        "message": "API communication working!",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+
 @app.get("/api/v1/organizations/setup-status")
 async def setup_status():
+    logger.info("Setup status endpoint called")
     return {
         "status": "not_setup",
         "message": "Organization setup status endpoint working"
@@ -74,6 +96,7 @@ async def setup_status():
 
 @app.post("/api/v1/organizations")
 async def create_organization():
+    logger.info("Create organization endpoint called")
     return {
         "status": "success",
         "message": "Organization creation endpoint working",
