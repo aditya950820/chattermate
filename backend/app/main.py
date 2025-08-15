@@ -332,6 +332,23 @@ async def get_agent(agent_id: str):
         "updated_at": "2024-01-01T00:00:00Z"
     }
 
+@app.put("/api/v1/agent/{agent_id}")
+async def update_agent(agent_id: str):
+    logger.info(f"Update agent endpoint called for agent_id: {agent_id}")
+    return {
+        "id": agent_id,
+        "name": "Test Agent",
+        "display_name": "Test Agent",
+        "description": "A test agent",
+        "agent_type": "general",
+        "instructions": ["Be helpful"],
+        "is_active": True,
+        "use_workflow": True,  # This will be updated based on the request
+        "organization_id": "org-123",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+
 @app.get("/api/v1/conversations")
 async def get_conversations():
     logger.info("Conversations endpoint called")
@@ -363,6 +380,66 @@ async def create_widget():
         "name": "Test Widget",
         "agent_id": "agent-123",
         "created_at": "2024-01-01T00:00:00Z"
+    }
+
+@app.get("/api/v1/workflow/agent/{agent_id}")
+async def get_workflow_by_agent(agent_id: str):
+    logger.info(f"Get workflow by agent endpoint called for agent_id: {agent_id}")
+    return {
+        "id": "workflow-123",
+        "name": "Test Workflow",
+        "description": "A test workflow",
+        "status": "draft",
+        "version": 1,
+        "is_template": False,
+        "default_language": "en",
+        "canvas_data": {},
+        "settings": {},
+        "organization_id": "org-123",
+        "agent_id": agent_id,
+        "created_by": "user-123",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+
+@app.post("/api/v1/workflow")
+async def create_workflow():
+    logger.info("Create workflow endpoint called")
+    return {
+        "id": "workflow-123",
+        "name": "Test Workflow",
+        "description": "A test workflow",
+        "status": "draft",
+        "version": 1,
+        "is_template": False,
+        "default_language": "en",
+        "canvas_data": {},
+        "settings": {},
+        "organization_id": "org-123",
+        "agent_id": "agent-123",
+        "created_by": "user-123",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+
+@app.put("/api/v1/workflow/{workflow_id}")
+async def update_workflow(workflow_id: str):
+    logger.info(f"Update workflow endpoint called for workflow_id: {workflow_id}")
+    return {
+        "id": workflow_id,
+        "name": "Test Workflow",
+        "description": "A test workflow",
+        "status": "published",
+        "version": 1,
+        "is_template": False,
+        "default_language": "en",
+        "canvas_data": {},
+        "settings": {},
+        "organization_id": "org-123",
+        "agent_id": "agent-123",
+        "created_by": "user-123",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
     }
 
 # Create upload directories if they don't exist
