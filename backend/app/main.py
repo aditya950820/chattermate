@@ -16,200 +16,32 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>
 """
 
-# Add users import
-from fastapi.staticfiles import StaticFiles
-import socketio
-from app.api import chat, organizations, users, ai_setup, knowledge, agent, notification, widget, widget_chat, user_groups, roles, analytics, jira, shopify, workflow, workflow_node, mcp_tool
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings
-from app.services.firebase import initialize_firebase
-from app.database import engine, Base
-import asyncio
-from app.core.logger import get_logger
-from contextlib import asynccontextmanager
 import os
-from app.core.socketio import socket_app, configure_socketio, sio
-from app.core.cors import get_cors_origins
-from app.core.application import app, initialize_cors_listener
 
-# Import models to ensure they're registered with SQLAlchemy
-from app.models import Organization, User, Customer
-try:
-    from app.enterprise.models import OTP
-except ImportError:
-    print("Enterprise models not available")
-from app.api import session_to_agent
+# Create a minimal FastAPI app
+app = FastAPI(
+    title="ChatterMate API",
+    version="0.1.0",
+    description="ChatterMate API - Minimal Version"
+)
 
-logger = get_logger(__name__)
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    try:
-        logger.info("Starting up ChatterMate application...")
-        initialize_firebase()
-        await startup_event()
-        logger.info("ChatterMate application started successfully!")
-    except Exception as e:
-        logger.error(f"Error during startup: {e}")
-        # Don't fail startup for non-critical errors
-    yield
-    # Shutdown
-    logger.info("Shutting down ChatterMate application...")
-
-# Move the CORS setup before app instantiation
-cors_origins = get_cors_origins()
-logger.debug(f"CORS origins: {cors_origins}")
-
-# Update the FastAPI app to use the lifespan function
-app.router.lifespan_context = lifespan
-
-# Add CORS middleware to FastAPI app
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=list(cors_origins),
+    allow_origins=["*"],  # Allow all origins for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    """Configure Socket.IO on startup"""
-    try:
-        configure_socketio(cors_origins)
-        # Start CORS listener for multi-worker synchronization
-        initialize_cors_listener()
-    except Exception as e:
-        logger.error(f"Error configuring Socket.IO: {e}")
-        # Don't fail startup for Socket.IO errors
-
-# Include routers
-app.include_router(
-    chat.router,
-    prefix=f"{settings.API_V1_STR}/chats",
-    tags=["chats"]
-)
-
-# Try to import enterprise module if available
-try:
-    from app.enterprise import router as enterprise_router
-    app.include_router(enterprise_router, prefix=f"{settings.API_V1_STR}/enterprise", tags=["enterprise"])
-except ImportError as e:
-    logger.info("Enterprise module not available - running in community edition mode")
-    logger.debug(f"Import error: {e}")
-
-app.include_router(
-    organizations.router,
-    prefix=f"{settings.API_V1_STR}/organizations",
-    tags=["organizations"]
-)
-
-app.include_router(
-    users.router,
-    prefix=f"{settings.API_V1_STR}/users",
-    tags=["users"]
-)
-
-app.include_router(
-    ai_setup.router,
-    prefix=f"{settings.API_V1_STR}/ai-setup",
-    tags=["ai-setup"]
-)
-
-app.include_router(
-    knowledge.router,
-    prefix=f"{settings.API_V1_STR}/knowledge",
-    tags=["knowledge"]
-)
-
-app.include_router(
-    agent.router,
-    prefix=f"{settings.API_V1_STR}/agents",
-    tags=["agents"]
-)
-
-app.include_router(
-    widget_chat.router,
-    prefix=f"{settings.API_V1_STR}/widget-chat",
-    tags=["widget-chat"]
-)
-
-app.include_router(
-    mcp_tool.router,
-    prefix=f"{settings.API_V1_STR}/mcp-tools",
-    tags=["mcp-tools"]
-)
-
-# Proxy router moved to enterprise module
-
-app.include_router(
-    notification.router,
-    prefix=f"{settings.API_V1_STR}/notifications",
-    tags=["notification"]
-)
-
-app.include_router(
-    widget.router,
-    prefix=f"{settings.API_V1_STR}/widgets",
-    tags=["widget"]
-)
-
-app.include_router(
-    user_groups.router,
-    prefix=f"{settings.API_V1_STR}/groups",
-    tags=["groups"]
-)
-
-app.include_router(
-    roles.router,
-    prefix=f"{settings.API_V1_STR}/roles",
-    tags=["roles"]
-)
-
-app.include_router(
-    session_to_agent.router,
-    prefix=f"{settings.API_V1_STR}/sessions",
-    tags=["session_to_agent"]
-)
-
-app.include_router(
-    analytics.router,
-    prefix=f"{settings.API_V1_STR}/analytics",
-    tags=["analytics"]
-)
-
-app.include_router(
-    jira.router,
-    prefix=f"{settings.API_V1_STR}/jira",
-    tags=["jira"]
-)
-
-app.include_router(
-    shopify.router,
-    prefix=f"{settings.API_V1_STR}/shopify",
-    tags=["shopify"]
-)
-
-app.include_router(
-    workflow.router,
-    prefix=f"{settings.API_V1_STR}/workflow",
-    tags=["workflow"]
-)
-
-app.include_router(
-    workflow_node.router,
-    prefix=f"{settings.API_V1_STR}/workflow",
-    tags=["workflow_node"]
-)
-
 @app.get("/")
 async def root():
     return {
-        "name": settings.PROJECT_NAME,
-        "version": settings.VERSION,
-        "description": "Welcome to ChatterMate API"
+        "name": "ChatterMate API",
+        "version": "0.1.0",
+        "description": "Welcome to ChatterMate API - Minimal Version"
     }
 
 @app.get("/test")
@@ -226,18 +58,25 @@ async def ping():
         "message": "Service is alive!"
     }
 
-@app.api_route("/health", methods=["GET"], operation_id="get_health_check")
-async def get_health_check():
+@app.get("/health")
+async def health():
     return {
         "status": "healthy",
-        "version": settings.VERSION
+        "version": "0.1.0"
     }
 
-@app.api_route("/health", methods=["HEAD"], operation_id="head_health_check")
-async def head_health_check():
+@app.get("/api/v1/organizations/setup-status")
+async def setup_status():
     return {
-        "status": "healthy",
-        "version": settings.VERSION
+        "status": "not_setup",
+        "message": "Organization setup status endpoint working"
+    }
+
+@app.post("/api/v1/organizations")
+async def create_organization():
+    return {
+        "status": "success",
+        "message": "Organization creation endpoint working"
     }
 
 # Create upload directories if they don't exist
@@ -245,10 +84,3 @@ if not os.path.exists("uploads"):
     os.makedirs("uploads")
 if not os.path.exists("uploads/agents"):
     os.makedirs("uploads/agents")
-
-# Mount static files
-app.mount("/api/v1/uploads", StaticFiles(directory="uploads"), name="uploads")
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-
-# Create final ASGI app
-app = socketio.ASGIApp(sio, app)

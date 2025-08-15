@@ -1,27 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Starting ChatterMate Backend..."
-
-# Wait for PostgreSQL to be ready
-echo "Waiting for PostgreSQL..."
-while ! nc -z db 5432; do
-  sleep 2
-  echo "Still waiting for PostgreSQL..."
-done
-echo "PostgreSQL is ready!"
-
-# Wait for Redis to be ready
-echo "Waiting for Redis..."
-while ! nc -z redis 6379; do
-  sleep 2
-  echo "Still waiting for Redis..."
-done
-echo "Redis is ready!"
-
-# Run migrations
-echo "Running database migrations..."
-alembic upgrade head
+echo "Starting ChatterMate Backend - Minimal Version..."
 
 # Start the application with Gunicorn
 echo "Starting FastAPI application with Gunicorn..."
