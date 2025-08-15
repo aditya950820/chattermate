@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.backend.prod
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       - ENVIRONMENT=production
       - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/chattermate
@@ -17,7 +17,7 @@ services:
       # Optional: override these at deploy time in Coolify if needed
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
       - VITE_WIDGET_URL=${VITE_WIDGET_URL:-http://localhost}
-      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:8000}
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:8001}
       # HuggingFace/PyTorch caches
       - HF_HOME=/app/.cache/huggingface
       - TRANSFORMERS_CACHE=/app/.cache/huggingface/transformers
