@@ -295,6 +295,43 @@ async def get_agents():
         "total": 0
     }
 
+@app.get("/api/v1/agent/list")
+async def get_agent_list():
+    logger.info("Agent list endpoint called")
+    return []
+
+@app.post("/api/v1/agent")
+async def create_agent():
+    logger.info("Create agent endpoint called")
+    return {
+        "id": "agent-123",
+        "name": "Test Agent",
+        "display_name": "Test Agent",
+        "description": "A test agent",
+        "agent_type": "general",
+        "instructions": ["Be helpful"],
+        "is_active": True,
+        "organization_id": "org-123",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+
+@app.get("/api/v1/agent/{agent_id}")
+async def get_agent(agent_id: str):
+    logger.info(f"Get agent endpoint called for agent_id: {agent_id}")
+    return {
+        "id": agent_id,
+        "name": "Test Agent",
+        "display_name": "Test Agent",
+        "description": "A test agent",
+        "agent_type": "general",
+        "instructions": ["Be helpful"],
+        "is_active": True,
+        "organization_id": "org-123",
+        "created_at": "2024-01-01T00:00:00Z",
+        "updated_at": "2024-01-01T00:00:00Z"
+    }
+
 @app.get("/api/v1/conversations")
 async def get_conversations():
     logger.info("Conversations endpoint called")
@@ -311,6 +348,21 @@ async def get_analytics():
         "total_messages": 0,
         "active_agents": 0,
         "user_satisfaction": 0
+    }
+
+@app.get("/api/v1/widgets")
+async def get_widgets():
+    logger.info("Widgets endpoint called")
+    return []
+
+@app.post("/api/v1/widgets")
+async def create_widget():
+    logger.info("Create widget endpoint called")
+    return {
+        "id": "widget-123",
+        "name": "Test Widget",
+        "agent_id": "agent-123",
+        "created_at": "2024-01-01T00:00:00Z"
     }
 
 # Create upload directories if they don't exist
