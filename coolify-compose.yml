@@ -82,8 +82,16 @@ services:
       - EXPLORE_USER_ID=${EXPLORE_USER_ID:-154540a3-6177-4b1b-aab2-f23f0ef74ac7}
       - EXPLORE_WIDGET_ID=${EXPLORE_WIDGET_ID:-397046dc-0093-4499-ab45-a0afe3c3ee14}
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     volumes:
       - huggingface_cache:/app/.cache/huggingface
       - torch_cache:/app/.cache/torch
@@ -106,12 +114,24 @@ services:
       - POSTGRES_DB=chattermate
       - POSTGRES_USER=chattermate
       - POSTGRES_PASSWORD=chattermate
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chattermate -d chattermate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     volumes:
       - redis_data:/data
     restart: unless-stopped
