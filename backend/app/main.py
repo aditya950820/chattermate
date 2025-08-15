@@ -18,15 +18,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings
-from app.database import engine, Base
 import os
 
 # Create a FastAPI app with basic configuration
 app = FastAPI(
     title="ChatterMate API",
     version="0.1.0",
-    description="ChatterMate API - With Database"
+    description="ChatterMate API - Testing Database Connection"
 )
 
 # Add CORS middleware
@@ -43,7 +41,7 @@ async def root():
     return {
         "name": "ChatterMate API",
         "version": "0.1.0",
-        "description": "Welcome to ChatterMate API - With Database"
+        "description": "Welcome to ChatterMate API - Testing Database Connection"
     }
 
 @app.get("/test")
@@ -80,6 +78,24 @@ async def create_organization():
         "status": "success",
         "message": "Organization creation endpoint working"
     }
+
+@app.get("/test-db")
+async def test_db():
+    try:
+        from app.core.config import settings
+        from app.database import engine
+        with engine.connect() as conn:
+            result = conn.execute('SELECT 1')
+            return {
+                "status": "success",
+                "message": "Database connection working",
+                "result": str(result.fetchone())
+            }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Database connection failed: {str(e)}"
+        }
 
 # Create upload directories if they don't exist
 if not os.path.exists("uploads"):
