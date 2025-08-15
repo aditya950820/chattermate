@@ -1,0 +1,83 @@
+# Web Framework
+fastapi
+uvicorn
+python-socketio
+websockets
+
+# Database
+sqlalchemy
+alembic
+psycopg[binary]>=3.1.0
+asyncpg
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Environment & Config
+python-dotenv
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Utilities
+email-validator
+python-dateutil
+requests
+beautifulsoup4
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov==4.1.0
+pytest-mock
+coverage==7.4.1
+
+
+#ai
+openai
+agno
+duckduckgo-search
+pypdf
+pgvector
+
+google-generativeai
+google-cloud-aiplatform
+ollama
+
+#ocr
+rapidocr-onnxruntime
+
+#pdf
+pypdf
+
+pytz
+
+firebase_admin
+beautifulsoup4
+aiofiles
+
+gunicorn
+
+redis
+
+
+aiohttp
+
+bs4
+
+boto3
+
+groq
+
+sentence-transformers
+
+fastembed
+
+# Shopify API
+ShopifyAPI
+
+mcp
+
+# UV tool runner for Python-based MCP servers
+uv
