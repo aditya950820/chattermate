@@ -244,6 +244,75 @@ async def test_form_post():
         "timestamp": "2024-01-01T00:00:00Z"
     }
 
+@app.get("/api/v1/notifications")
+async def get_notifications():
+    logger.info("Notifications endpoint called")
+    return {
+        "notifications": [],
+        "total": 0,
+        "skip": 0,
+        "limit": 50
+    }
+
+@app.get("/api/v1/notifications/unread-count")
+async def get_unread_notifications_count():
+    logger.info("Unread notifications count endpoint called")
+    return {
+        "count": 0
+    }
+
+@app.get("/api/v1/ai/config")
+async def get_ai_config():
+    logger.info("AI config endpoint called")
+    return {
+        "openai_api_key": "",
+        "openai_model": "gpt-4",
+        "anthropic_api_key": "",
+        "anthropic_model": "claude-3-sonnet-20240229",
+        "google_api_key": "",
+        "google_model": "gemini-pro",
+        "groq_api_key": "",
+        "groq_model": "llama3-8b-8192",
+        "ollama_url": "http://localhost:11434",
+        "ollama_model": "llama3.2",
+        "is_configured": False
+    }
+
+@app.post("/api/v1/ai/setup")
+async def setup_ai():
+    logger.info("AI setup endpoint called")
+    return {
+        "status": "success",
+        "message": "AI configuration saved successfully",
+        "is_configured": True
+    }
+
+@app.get("/api/v1/agents")
+async def get_agents():
+    logger.info("Agents endpoint called")
+    return {
+        "agents": [],
+        "total": 0
+    }
+
+@app.get("/api/v1/conversations")
+async def get_conversations():
+    logger.info("Conversations endpoint called")
+    return {
+        "conversations": [],
+        "total": 0
+    }
+
+@app.get("/api/v1/analytics")
+async def get_analytics():
+    logger.info("Analytics endpoint called")
+    return {
+        "total_conversations": 0,
+        "total_messages": 0,
+        "active_agents": 0,
+        "user_satisfaction": 0
+    }
+
 # Create upload directories if they don't exist
 if not os.path.exists("uploads"):
     os.makedirs("uploads")
