@@ -82,8 +82,10 @@ async def create_organization():
 @app.get("/test-db")
 async def test_db():
     try:
-        from app.core.config import settings
-        from app.database import engine
+        # Test database connection directly without using the config system
+        from sqlalchemy import create_engine
+        database_url = "postgresql+psycopg://chattermate:chattermate@db:5432/chattermate"
+        engine = create_engine(database_url)
         with engine.connect() as conn:
             result = conn.execute('SELECT 1')
             return {

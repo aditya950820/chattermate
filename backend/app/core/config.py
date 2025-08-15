@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # CORS Configuration
-    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", DEFAULT_CORS)
+    CORS_ORIGINS: List[str] = DEFAULT_CORS
     
     @field_validator('CORS_ORIGINS', mode='before')
     @classmethod
