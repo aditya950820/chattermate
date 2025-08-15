@@ -129,47 +129,66 @@ const handleDomainInput = (domain: string) => {
 }
 
 const handleSubmit = async () => {
+    console.log('=== FORM SUBMISSION DEBUG ===')
+    console.log('Organization name:', orgData.value.name, 'Valid:', isOrgNameValid.value)
+    console.log('Domain:', orgData.value.domain, 'Valid:', isDomainValid.value)
+    console.log('Admin name:', orgData.value.admin_name, 'Valid:', isAdminNameValid.value)
+    console.log('Admin email:', orgData.value.admin_email, 'Valid:', isEmailValid.value)
+    console.log('Password:', orgData.value.admin_password)
+    console.log('Confirm password:', confirmPassword.value)
+    console.log('Password strength:', passwordStrength.value)
+
     if (!isOrgNameValid.value) {
+        console.log('FAILED: Invalid organization name')
         error.value = 'Please enter a valid organization name'
         return
     }
 
     if (!isDomainValid.value) {
+        console.log('FAILED: Invalid domain')
         error.value = 'Please enter a valid domain'
         return
     }
 
     if (!isAdminNameValid.value) {
+        console.log('FAILED: Invalid admin name')
         error.value = 'Please enter a valid admin name'
         return
     }
 
     if (!isEmailValid.value) {
+        console.log('FAILED: Invalid email')
         error.value = 'Please enter a valid email address'
         return
     }
 
     if (orgData.value.admin_password !== confirmPassword.value) {
+        console.log('FAILED: Passwords do not match')
         error.value = 'Passwords do not match'
         return
     }
 
-    if (!passwordStrength.value.hasMinLength || 
-        !passwordStrength.value.hasUpperCase || 
-        !passwordStrength.value.hasLowerCase || 
-        !passwordStrength.value.hasNumber || 
+    if (!passwordStrength.value.hasMinLength ||
+        !passwordStrength.value.hasUpperCase ||
+        !passwordStrength.value.hasLowerCase ||
+        !passwordStrength.value.hasNumber ||
         !passwordStrength.value.hasSpecialChar) {
+        console.log('FAILED: Password requirements not met')
         error.value = 'Password must meet all requirements'
         return
     }
 
+    console.log('VALIDATION PASSED - Submitting form...')
     loading.value = true
     error.value = ''
 
     try {
+        console.log('Calling createOrganization with data:', orgData.value)
         await createOrganization(orgData.value)
+        console.log('Organization created successfully!')
         router.push('/ai-agents')
     } catch (e) {
+        console.error('Error creating organization:', e)
         error.value = e instanceof Error ? e.message : 'Failed to create organization'
     } finally {
         loading.value = false
@@ -236,15 +255,15 @@ const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
 
                         <div class="form-group">
                             <label class="form-label" for="timezone">Timezone</label>
-                            <select 
-                                class="form-input" 
-                                id="timezone" 
-                                v-model="selectedTimezone" 
+                            <select
+                                class="form-input"
+                                id="timezone"
+                                v-model="selectedTimezone"
                                 required
                             >
-                                <option 
-                                    v-for="tz in timezones" 
-                                    :key="tz.value" 
+                                <option
+                                    v-for="tz in timezones"
+                                    :key="tz.value"
                                     :value="tz.value"
                                     :selected="selectedTimezone === tz.value"
                                 >
@@ -262,8 +281,8 @@ const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
                                 <div v-for="day in days" :key="day.key" class="day-row">
                                     <div class="day-toggle">
                                         <label class="toggle">
-                                            <input 
-                                                type="checkbox" 
+                                            <input
+                                                type="checkbox"
                                                 v-model="orgData.business_hours[day.key].enabled"
                                             >
                                             <span class="toggle-slider"></span>
@@ -271,7 +290,7 @@ const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
                                         <span class="day-label">{{ day.label }}</span>
                                     </div>
                                     <div class="time-selects" :class="{ disabled: !orgData.business_hours[day.key].enabled }">
-                                        <select 
+                                        <select
                                             v-model="orgData.business_hours[day.key].start"
                                             :disabled="!orgData.business_hours[day.key].enabled"
                                         >
@@ -280,7 +299,7 @@ const timeOptions = Array.from({ length: 24 * 4 }, (_, i) => {
                                             </option>
                                         </select>
                                         <span class="time-separator">to</span>
-                                        <select 
+                                        <select
                                             v-model="orgData.business_hours[day.key].end"
                                             :disabled="!orgData.business_hours[day.key].enabled"
                                         >
@@ -653,11 +672,11 @@ input:checked + .toggle-slider:before {
         align-items: flex-start;
         gap: var(--space-sm);
     }
-    
+
     .day-toggle {
         width: 100%;
     }
-    
+
     .time-selects {
         width: 100%;
         justify-content: space-between;
