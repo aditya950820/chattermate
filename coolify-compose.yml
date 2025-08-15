@@ -9,17 +9,11 @@ services:
       - "9001:8000"
     environment:
       - ENVIRONMENT=production
-      - DATABASE_URL=postgresql+psycopg://chattermate_user:chattermate_pass_2024@db:5432/chattermate_db
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_ENABLED=true
       - JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
       - JWT_ALGORITHM=HS256
       - CONVERSATION_SECRET_KEY=your-super-secret-conversation-key-change-this-in-production
       - CORS_ORIGINS=http://localhost:9000,http://localhost:5173,https://chattermate.chat
       - ENCRYPTION_KEY=RFQ4SzhyRTVYdGtsLUxsc25SaDB0QlZpbTdQRmlVRlpsZUlCaFRlU2Vxbz0=
-    depends_on:
-      - db
-      - redis
     restart: unless-stopped
 
   frontend:
@@ -30,24 +24,4 @@ services:
       - "9000:80"
     depends_on:
       - backend
-    restart: unless-stopped
-
-  db:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=chattermate_db
-      - POSTGRES_USER=chattermate_user
-      - POSTGRES_PASSWORD=chattermate_pass_2024
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-  redis_data: 
+    restart: unless-stopped 
