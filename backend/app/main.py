@@ -212,6 +212,20 @@ async def root():
         "description": "Welcome to ChatterMate API"
     }
 
+@app.get("/test")
+async def test():
+    return {
+        "status": "ok",
+        "message": "Backend is working!"
+    }
+
+@app.get("/ping")
+async def ping():
+    return {
+        "status": "pong",
+        "message": "Service is alive!"
+    }
+
 @app.api_route("/health", methods=["GET"], operation_id="get_health_check")
 async def get_health_check():
     return {
